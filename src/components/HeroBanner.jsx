@@ -56,7 +56,7 @@ export const HeroBanner = ({ onExploreClick }) => {
 
             <div className="p-3 bg-indigo-950/60 rounded-xl border border-indigo-800/40 flex gap-3 items-center">
               <img
-                src="/images/images.jpg"
+                src="/images/clean-code.jpg"
                 alt="Clean Code"
                 className="w-14 h-18 object-cover rounded-lg shadow-md"
               />
