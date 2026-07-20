@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Star, Eye, ImageOff } from 'lucide-react';
+import { ShoppingCart, Star, Eye, BookOpen } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+
+const DEFAULT_COVERS = {
+  'Công nghệ': 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=600',
+  'Kinh tế': 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600',
+  'Văn học': 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=600',
+  'Kỹ năng sống': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=600',
+  'Thiếu nhi': 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=600'
+};
 
 export const BookCard = ({ book, onQuickView, onShowToast }) => {
   const { addToCart } = useCart();
@@ -20,8 +28,9 @@ export const BookCard = ({ book, onQuickView, onShowToast }) => {
     ? Math.round(((book.price - book.sale_price) / book.price) * 100) 
     : 0;
 
-  // Primary image source (supports local /images/*.jpg or online URL)
-  const coverSrc = book.cover_url || book.local_jpg;
+  // Smart image resolution: if error or missing, fallback to category high-res cover
+  const fallbackUrl = DEFAULT_COVERS[book.category] || DEFAULT_COVERS['Kỹ năng sống'];
+  const coverSrc = imgError ? fallbackUrl : (book.cover_url || book.local_jpg || fallbackUrl);
 
   return (
     <div 
@@ -29,22 +38,14 @@ export const BookCard = ({ book, onQuickView, onShowToast }) => {
       className="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer relative"
     >
       {/* Cover Image Container */}
-      <div className="relative aspect-[3/4] bg-indigo-950/90 overflow-hidden flex items-center justify-center">
-        {!imgError ? (
-          <img
-            src={coverSrc}
-            alt={book.title}
-            onError={() => setImgError(true)}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-        ) : (
-          <div className="p-4 text-center text-indigo-200 flex flex-col items-center">
-            <ImageOff className="w-8 h-8 opacity-60 mb-2" />
-            <span className="text-[11px] font-bold line-clamp-2">{book.title}</span>
-            <span className="text-[9px] opacity-75 mt-1">Cần file .jpg trong public/images/</span>
-          </div>
-        )}
+      <div className="relative aspect-[3/4] bg-slate-100 overflow-hidden flex items-center justify-center">
+        <img
+          src={coverSrc}
+          alt={book.title}
+          onError={() => setImgError(true)}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
         
         {/* Category Pill */}
         <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-indigo-700 text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm">

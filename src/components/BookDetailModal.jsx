@@ -2,8 +2,17 @@ import React, { useState } from 'react';
 import { X, ShoppingCart, Star, ShieldCheck, Truck, BookOpen, Minus, Plus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
+const DEFAULT_COVERS = {
+  'Công nghệ': 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=600',
+  'Kinh tế': 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600',
+  'Văn học': 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=600',
+  'Kỹ năng sống': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=600',
+  'Thiếu nhi': 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=600'
+};
+
 export const BookDetailModal = ({ book, isOpen, onClose, onShowToast }) => {
   const [quantity, setQuantity] = useState(1);
+  const [imgError, setImgError] = useState(false);
   const { addToCart } = useCart();
 
   if (!isOpen || !book) return null;
@@ -18,7 +27,8 @@ export const BookDetailModal = ({ book, isOpen, onClose, onShowToast }) => {
     onClose();
   };
 
-  const coverSrc = book.cover_url || book.local_jpg;
+  const fallbackUrl = DEFAULT_COVERS[book.category] || DEFAULT_COVERS['Kỹ năng sống'];
+  const coverSrc = imgError ? fallbackUrl : (book.cover_url || book.local_jpg || fallbackUrl);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
@@ -35,6 +45,7 @@ export const BookDetailModal = ({ book, isOpen, onClose, onShowToast }) => {
             <img
               src={coverSrc}
               alt={book.title}
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover"
             />
             <span className="absolute top-3 left-3 bg-indigo-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
