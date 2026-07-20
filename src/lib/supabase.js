@@ -4,8 +4,8 @@ const getSupabaseConfig = () => {
   const localUrl = localStorage.getItem('bv2_supabase_url');
   const localKey = localStorage.getItem('bv2_supabase_key');
 
- const supabaseUrl = 'https://futtyurmfkuhzgamxmma.supabase.co';
- const supabaseAnonKey = 'sb_publishable_z2kj14n2C87quRad-DqBjQ_f5yATXSb';
+  const supabaseUrl = localUrl || import.meta.env.VITE_SUPABASE_URL || 'https://futtyurmfkuhzgamxmma.supabase.co';
+  const supabaseAnonKey = localKey || import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_z2kj14n2C87quRad-DqBjQ_f5yATXSb';
 
   const isConfigured = Boolean(
     supabaseUrl && 
@@ -19,9 +19,7 @@ const getSupabaseConfig = () => {
 
 const config = getSupabaseConfig();
 
-export const supabase = config.isConfigured
-  ? createClient(config.supabaseUrl, config.supabaseAnonKey)
-  : createClient('https://placeholder-project.supabase.co', 'placeholder-anon-key');
+export const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
 
 export const isSupabaseConnected = () => config.isConfigured;
 
