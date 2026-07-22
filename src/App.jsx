@@ -15,6 +15,7 @@ import { AboutModal } from './components/AboutModal';
 import { PolicyModal } from './components/PolicyModal';
 import { ContactModal } from './components/ContactModal';
 import { Toast } from './components/Toast';
+import { AdminPanel } from './components/AdminPanel';
 import { fetchBooks } from './services/bookService';
 import { BookOpen, FileImage, ShieldCheck, PhoneCall, Info, Sparkles, Heart } from 'lucide-react';
 
@@ -33,12 +34,21 @@ const MainApp = () => {
   const [isPolicyOpen, setIsPolicyOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [selectedBookDetail, setSelectedBookDetail] = useState(null);
+  const [isAdminView, setIsAdminView] = useState(false);
 
   const [toast, setToast] = useState({ message: '', type: 'success' });
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast({ message: '', type: 'success' }), 4000);
+  };
+
+  const refreshBooks = () => {
+    setLoading(true);
+    fetchBooks(selectedCategory, searchQuery).then(({ data }) => {
+      if (data) setBooks(data);
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
@@ -55,6 +65,24 @@ const MainApp = () => {
     return () => { isMounted = false; };
   }, [selectedCategory, searchQuery]);
 
+  if (isAdminView) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 animate-fade-in">
+        <AdminPanel
+          books={books}
+          onRefreshBooks={refreshBooks}
+          onBackToStore={() => setIsAdminView(false)}
+          onShowToast={showToast}
+        />
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ message: '', type: 'success' })}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
       <Navbar
@@ -65,6 +93,7 @@ const MainApp = () => {
         onOpenAbout={() => setIsAboutOpen(true)}
         onOpenPolicy={() => setIsPolicyOpen(true)}
         onOpenContact={() => setIsContactOpen(true)}
+        onOpenAdmin={() => setIsAdminView(true)}
         onShowToast={showToast}
       />
 

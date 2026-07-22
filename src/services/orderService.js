@@ -96,3 +96,62 @@ export const fetchUserOrders = async (userId) => {
     return { data: mockOrders, error: null };
   }
 };
+
+// Admin Order Management Services
+export const fetchAllOrders = async () => {
+  if (!isSupabaseConnected()) {
+    const mockOrders = JSON.parse(localStorage.getItem('bv2_mock_orders') || '[]');
+    return { data: mockOrders, error: null };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (
+          id,
+          quantity,
+          price,
+          books (
+            id,
+            title,
+            cover_url,
+            author
+          )
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error fetching all orders for admin:', error);
+    const mockOrders = JSON.parse(localStorage.getItem('bv2_mock_orders') || '[]');
+    return { data: mockOrders, error: null };
+  }
+};
+
+export const updateOrderStatus = async (orderId, status) => {
+  if (!isSupabaseConnected()) {
+    const mockOrders = JSON.parse(localStorage.getItem('bv2_mock_orders') || '[]');
+    const updated = mockOrders.map(o => 
+      o.id === orderId ? { ...o, status } : o
+    );
+    localStorage.setItem('bv2_mock_orders', JSON.stringify(updated));
+    return { error: null };
+  }
+
+  try {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', orderId);
+
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return { error };
+  }
+};
