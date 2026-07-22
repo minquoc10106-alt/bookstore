@@ -148,17 +148,20 @@ export const Navbar = ({
                     <PhoneCall className="w-4 h-4 text-slate-400" /> Liên Hệ
                   </button>
 
-                  <div className="border-t border-slate-100 my-1"></div>
-
-                  <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      onOpenAdmin();
-                    }}
-                    className="w-full px-4 py-2.5 text-xs text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2 font-medium transition-colors"
-                  >
-                    <Settings className="w-4 h-4 text-slate-400" /> Trang Quản Trị (Admin)
-                  </button>
+                  {(!isConnected || profile?.role === 'admin') && (
+                    <>
+                      <div className="border-t border-slate-100 my-1"></div>
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          onOpenAdmin();
+                        }}
+                        className="w-full px-4 py-2.5 text-xs text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2 font-medium transition-colors"
+                      >
+                        <Settings className="w-4 h-4 text-slate-400" /> Trang Quản Trị (Admin)
+                      </button>
+                    </>
+                  )}
 
                   <div className="border-t border-slate-100 my-1"></div>
 
